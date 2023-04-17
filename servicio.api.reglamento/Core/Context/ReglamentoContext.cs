@@ -40,6 +40,8 @@ public class ReglamentoContext : DbContext
             reglamento.Property(p => p.Tipo).IsRequired();
             reglamento.Property(p => p.Estado).IsRequired();
             reglamento.Property(p => p.FechaCreado);
+
+            reglamento.HasData(reglamentoInit);
         });
 
 
