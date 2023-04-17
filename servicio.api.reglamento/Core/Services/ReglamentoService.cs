@@ -4,7 +4,7 @@ using servicio.api.reglamento.Core.Interfaces;
 
 namespace servicio.api.reglamento.Core.Services;
 
-public class ReglamentoService : IReglamento
+public class ReglamentoService : IReglamentoService
 {
     private readonly ReglamentoContext _context;
 
@@ -15,16 +15,30 @@ public class ReglamentoService : IReglamento
 
     public IEnumerable<ReglamentoEntity> Get()
     {
-        return _context.Reglamentos;
+        return _context.Reglamentos.ToList();
     }
 
-    public async Task Create(ReglamentoEntity reglamento)
+    public async Task<ReglamentoEntity> GetById(Guid id)
+    {
+        var reglamento = await _context.Reglamentos.FindAsync(id);
+
+        if (reglamento != null)
+        {
+            return reglamento;
+        }
+
+        throw new Exception($"No existe el reglamento con ID: {id}");
+    }
+
+    public async Task<ReglamentoEntity> Create(ReglamentoEntity reglamento)
     {
         reglamento.FechaCreado = DateTime.Now;
 
-        _context.Add(reglamento);
+        await _context.AddAsync(reglamento);
 
         await _context.SaveChangesAsync();
+
+        return reglamento;
 
 
     }
@@ -42,8 +56,16 @@ public class ReglamentoService : IReglamento
             reglamentoActual.Tipo = reglamento.Tipo;
             reglamentoActual.Estado = reglamento.Estado;
 
-            await _context.SaveChangesAsync();
+            var rta = await _context.SaveChangesAsync();
+            Console.WriteLine(rta);
         }
+        else
+        {
+
+            throw new Exception($"Ocurrio un error al actualizar reglamento con ID: ${id}");
+        }
+
+
     }
     public async Task Delete(Guid id)
     {

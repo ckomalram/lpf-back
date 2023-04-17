@@ -14,7 +14,7 @@ builder.Services.AddSwaggerGen();
 // conf ef
 builder.Services.AddSqlServer<ReglamentoContext>(builder.Configuration.GetConnectionString("cnLpf"));
 // inyectar dependencias 
-builder.Services.AddScoped<IReglamento, ReglamentoService>();
+builder.Services.AddScoped<IReglamentoService, ReglamentoService>();
 
 
 
