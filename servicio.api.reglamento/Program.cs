@@ -1,3 +1,7 @@
+using servicio.api.reglamento.Core.Context;
+using servicio.api.reglamento.Core.Interfaces;
+using servicio.api.reglamento.Core.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -6,6 +10,13 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// conf ef
+builder.Services.AddSqlServer<ReglamentoContext>(builder.Configuration.GetConnectionString("cnLpf"));
+// inyectar dependencias 
+builder.Services.AddScoped<IReglamento, ReglamentoService>();
+
+
 
 var app = builder.Build();
 
