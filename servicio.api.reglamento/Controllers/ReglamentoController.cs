@@ -15,38 +15,55 @@ public class ReglamentoController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult Get()
+    public async Task<ActionResult<IEnumerable<ReglamentoEntity>>> GetAll()
     {
-        return Ok(_service.Get());
+        var rta = await _service.GetAll();
+        return Ok(rta);
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<ReglamentoEntity>> GetById(Guid id)
     {
         var rta = await _service.GetById(id);
+        if (rta == null)
+        {
+            return NotFound();
+        }
         return Ok(rta);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] ReglamentoEntity reglamento)
+    public async Task<ActionResult<ReglamentoEntity>> Create([FromBody] ReglamentoEntity reglamento)
     {
         var rta = await _service.Create(reglamento);
-        return Ok(rta);
+        Console.WriteLine(rta);
+        return CreatedAtAction(nameof(GetById), new { id = reglamento.ReglamentoId }, reglamento);
+        // return Ok(reglamento);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] ReglamentoEntity reglamento)
+    public async Task<ActionResult> Update(Guid id, [FromBody] ReglamentoEntity reglamento)
     {
-        await _service.Update(id, reglamento);
+
+        var rta = await _service.Update(id, reglamento);
+
+        if (!rta)
+        {
+            return NotFound();
+        }
 
         return Ok("Reglamento actualizado!");
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<ActionResult> Delete(Guid id)
     {
-        await _service.Delete(id);
+        var rta = await _service.Delete(id);
 
+        if (!rta)
+        {
+            return NotFound();
+        }
         return Ok("Reglamento eliminado correctamente");
     }
 

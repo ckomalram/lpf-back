@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using servicio.api.reglamento.Core.Context;
 using servicio.api.reglamento.Core.Entity;
 using servicio.api.reglamento.Core.Interfaces;
@@ -13,21 +14,16 @@ public class ReglamentoService : IReglamentoService
         _context = dbcontext;
     }
 
-    public IEnumerable<ReglamentoEntity> Get()
+    public async Task<IEnumerable<ReglamentoEntity>> GetAll()
     {
-        return _context.Reglamentos.ToList();
+        return await _context.Reglamentos.ToListAsync();
     }
 
     public async Task<ReglamentoEntity> GetById(Guid id)
     {
-        var reglamento = await _context.Reglamentos.FindAsync(id);
+        // return await _context.Reglamentos.FirstOrDefaultAsync(x => x.Id == id);
+        return await _context.Reglamentos.FindAsync(id);
 
-        if (reglamento != null)
-        {
-            return reglamento;
-        }
-
-        throw new Exception($"No existe el reglamento con ID: {id}");
     }
 
     public async Task<ReglamentoEntity> Create(ReglamentoEntity reglamento)
@@ -43,41 +39,45 @@ public class ReglamentoService : IReglamentoService
 
     }
 
-    public async Task Update(Guid id, ReglamentoEntity reglamento)
+    public async Task<bool> Update(Guid id, ReglamentoEntity reglamento)
     {
         var reglamentoActual = await _context.Reglamentos.FindAsync(id);
 
-        if (reglamentoActual != null)
+        if (reglamentoActual == null)
         {
-            reglamentoActual.Titulo = reglamento.Titulo;
-            reglamentoActual.Descripcion = reglamento.Descripcion;
-            reglamentoActual.DocumentoUrl = reglamento.DocumentoUrl;
-            reglamentoActual.ImagenUrl = reglamento.ImagenUrl;
-            reglamentoActual.Tipo = reglamento.Tipo;
-            reglamentoActual.Estado = reglamento.Estado;
-
-            var rta = await _context.SaveChangesAsync();
-            Console.WriteLine(rta);
+            return false;
+            // throw new Exception($"Ocurrio un error al actualizar reglamento con ID: ${id}");
         }
-        else
-        {
+        reglamentoActual.Titulo = reglamento.Titulo;
+        reglamentoActual.Descripcion = reglamento.Descripcion;
+        reglamentoActual.DocumentoUrl = reglamento.DocumentoUrl;
+        reglamentoActual.ImagenUrl = reglamento.ImagenUrl;
+        reglamentoActual.Tipo = reglamento.Tipo;
+        reglamentoActual.Estado = reglamento.Estado;
 
-            throw new Exception($"Ocurrio un error al actualizar reglamento con ID: ${id}");
-        }
+        var rta = await _context.SaveChangesAsync();
+        Console.WriteLine(rta);
+        return true;
 
 
     }
-    public async Task Delete(Guid id)
+    public async Task<bool> Delete(Guid id)
     {
         var reglamentoActual = await _context.Reglamentos.FindAsync(id);
 
-        if (reglamentoActual != null)
+        if (reglamentoActual == null)
         {
-            _context.Remove(reglamentoActual);
+            return false;
 
-            await _context.SaveChangesAsync();
+            // throw new Exception($"Ocurrio un error al eliminar reglamento con ID: ${id}");
 
         }
+
+        _context.Remove(reglamentoActual);
+
+        await _context.SaveChangesAsync();
+        return true;
+
     }
 
 
